@@ -1,0 +1,39 @@
+{
+  "name": "@freesignal/socketio",
+  "version": "0.1.0",
+  "description": "Socket.io trasnport package for FreeSignal protocol",
+  "homepage": "https://github.com/christianbraghette/freesignal-socketio#readme",
+  "bugs": {
+    "url": "https://github.com/christianbraghette/freesignal-socketio/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/christianbraghette/freesignal-socketio.git"
+  },
+  "license": "GPL-3.0-or-later",
+  "author": "Christian Braghette",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "pretest": "tsc",
+    "test": "node ./dist/test.js",
+    "prepare": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21"
+  },
+  "dependencies": {
+    "@freesignal/interfaces": "^0.3.1",
+    "@freesignal/protocol": "^0.8.0",
+    "@freesignal/utils": "^1.5.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  }
+}
