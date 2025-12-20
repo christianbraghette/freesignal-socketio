@@ -1,5 +1,6 @@
 import { AsyncMap } from "@freesignal/protocol";
-import { FreeSignalClient as FreeSignalClient, FreeSignalServer as FreeSignalServer } from "./index.js";
+import { FreeSignalClient as FreeSignalClient } from "./client.js";
+import { FreeSignalServer as FreeSignalServer } from "./server.js"
 import { decodeData } from "@freesignal/utils";
 
 const server = new FreeSignalServer({ keyExchange: new AsyncMap(), sessions: new AsyncMap(), users: new AsyncMap(), bundles: new AsyncMap(), bootstraps: new AsyncMap(), outbox: new AsyncMap() }).listen();
