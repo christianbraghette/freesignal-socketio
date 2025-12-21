@@ -22,9 +22,9 @@ import { Datagram, PrivateIdentityKey, UserId } from "@freesignal/protocol";
 import { ExportedKeySession, KeySession } from "@freesignal/protocol/double-ratchet";
 import { BootstrapRequest } from "@freesignal/protocol/node";
 import { EventCallback } from "easyemitter.ts";
-import http, { type Server as HttpServer } from "http";
+import { type Server as HttpServer } from "http";
 import { Server, Socket } from 'socket.io';
-import { FreeSignalSocketio } from "./base.js";
+import { FreeSignalSocketio, TransportEvent } from "./base.js";
 
 
 
@@ -54,7 +54,7 @@ export class FreeSignalServer extends FreeSignalSocketio {
         if (!socket.connected)
             this.addToOutbox(receiverId, datagram);
         else
-            socket.send(datagram.toBytes());
+            socket.emit(TransportEvent.MESSAGE, datagram.toBytes());
     };
 
     public listen(): this
@@ -64,11 +64,12 @@ export class FreeSignalServer extends FreeSignalSocketio {
         server ??= 12437;
         this.wss = new Server(server, {
             cors: {
-                origin: (origin, callback) => {
+                /*origin: (origin, callback) => {
                     // origin può essere undefined (curl, mobile app, server)
                     callback(null, true);
-                },
-                methods: ["GET", "POST"]
+                },*/
+                origin: '*',
+                //methods: ["GET", "POST"]
             }
         });
         this.wss.on('connection', async (socket) => {
@@ -82,14 +83,15 @@ export class FreeSignalServer extends FreeSignalSocketio {
             console.debug("Client connected: ", userId);
             this.connections.set(userId, socket);
 
-            socket.on('message', (data) => this.open(data));
+            socket.on(TransportEvent.MESSAGE, (data) => this.open(data));
             socket.on('disconnect', () => this.connections.delete(userId));
 
-            socket.emit('handshake', this.userId.toString());
-            if (!(await this.sessions.has(userId)))
+            socket.emit(TransportEvent.HANDSHAKE, this.userId.toString());
+            if (!(await this.sessions.has(userId))) {
                 this.sendBootstrap(userId);
-            else
+            } else {
                 this.sendHandshake(userId);
+            }
         });
         return this;
     }

@@ -3,6 +3,12 @@ import { Datagram, PrivateIdentityKey, UserId } from "@freesignal/protocol";
 import { ExportedKeySession } from "@freesignal/protocol/double-ratchet";
 import { BootstrapRequest, FreeSignalNode } from "@freesignal/protocol/node";
 
+const TransportEventPrefix = "transport:";
+export enum TransportEvent {
+    MESSAGE = `${TransportEventPrefix}message`,
+    HANDSHAKE = `${TransportEventPrefix}handshake`
+}
+
 export class FreeSignalSocketio extends FreeSignalNode {
     protected readonly outbox: LocalStorage<string, Uint8Array[]>;
 

@@ -4,7 +4,7 @@ import { ExportedKeySession, KeySession } from "@freesignal/protocol/double-ratc
 import { BootstrapRequest } from "@freesignal/protocol/node";
 import { io, Socket } from "socket.io-client";
 import { EventCallback } from "easyemitter.ts";
-import { FreeSignalSocketio } from "./base.js"
+import { FreeSignalSocketio, TransportEvent } from "./base.js"
 
 export class FreeSignalClient extends FreeSignalSocketio {
     private _serverId?: string;
@@ -39,7 +39,7 @@ export class FreeSignalClient extends FreeSignalSocketio {
             if (!this.socket || !this.socket.connected)
                 this.addToOutbox(receiverId, datagram);
             else
-                this.socket.send(datagram.toBytes());
+                this.socket.emit(TransportEvent.MESSAGE, datagram.toBytes());
     }
 
     public connect(url: string | URL): Promise<void> {
@@ -51,14 +51,17 @@ export class FreeSignalClient extends FreeSignalSocketio {
                     }
                 });
 
-                this.socket.on('handshake', async (userId) => {
+                this.socket.on(TransportEvent.MESSAGE, (data) => {
+                    this.open(new Uint8Array(data));
+                });
+
+                this.socket.on(TransportEvent.HANDSHAKE, async (userId) => {
                     this._serverId = userId;
                     await this.waitHandshaked(userId);
                     await this.flushOutbox();
                     resolve();
                 });
 
-                this.socket.on('message', async (data: Uint8Array) => { this.open(data); });
                 this.socket.on('disconnect', () => {
                     this.onClose();
                     this.socket = undefined;

@@ -21,5 +21,5 @@ setTimeout(() => Promise.all(["I'm thinking...", "Is this secure?"].map(msg => c
 
 setTimeout(() => process.exit(), 3500);
 
-client1.connect("ws://localhost:12437");
-client2.connect("ws://localhost:12437");
+client1.connect("ws://localhost:12437").then(() => console.log("Connected"));
+client2.connect("ws://localhost:12437").then(() => console.log("Connected"));
