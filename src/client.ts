@@ -62,6 +62,8 @@ export class FreeSignalClient extends FreeSignalSocketio {
                     resolve();
                 });
 
+                this.socket.on('error', (err) => this.onError(err));
+
                 this.socket.on('disconnect', () => {
                     this.onClose();
                     this.socket = undefined;

@@ -26,8 +26,6 @@ import { type Server as HttpServer } from "http";
 import { Server, Socket } from 'socket.io';
 import { FreeSignalSocketio, TransportEvent } from "./base.js";
 
-
-
 export class FreeSignalServer extends FreeSignalSocketio {
     private wss?: Server;
     private readonly connections = new Map<string, Socket>();
@@ -64,12 +62,7 @@ export class FreeSignalServer extends FreeSignalSocketio {
         server ??= 12437;
         this.wss = new Server(server, {
             cors: {
-                /*origin: (origin, callback) => {
-                    // origin può essere undefined (curl, mobile app, server)
-                    callback(null, true);
-                },*/
-                origin: '*',
-                //methods: ["GET", "POST"]
+                origin: (origin, callback) => callback(null, origin)
             }
         });
         this.wss.on('connection', async (socket) => {
