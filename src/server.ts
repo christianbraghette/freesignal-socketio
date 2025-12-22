@@ -17,24 +17,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-import { Database, LocalStorage, Crypto, KeyExchangeDataBundle } from "@freesignal/interfaces";
-import { Datagram, PrivateIdentityKey, UserId } from "@freesignal/protocol";
-import { ExportedKeySession, KeySession } from "@freesignal/protocol/double-ratchet";
-import { BootstrapRequest } from "@freesignal/protocol/node";
+import { Datagram, UserId } from "@freesignal/protocol";
+import { KeySession } from "@freesignal/protocol/double-ratchet";
 import { EventCallback } from "easyemitter.ts";
 import { type Server as HttpServer } from "http";
 import { Server, Socket } from 'socket.io';
-import { FreeSignalSocketio, TransportEvent } from "./base.js";
+import { FreeSignalSocketio, FreeSignalSocketioState, TransportEvent } from "./base.js";
 
 export class FreeSignalServer extends FreeSignalSocketio {
     private wss?: Server;
     private readonly connections = new Map<string, Socket>();
 
-    public constructor(
-        storage: Database<{ sessions: LocalStorage<string, ExportedKeySession>; keyExchange: LocalStorage<string, Crypto.KeyPair>; users: LocalStorage<string, string>; bundles: LocalStorage<string, KeyExchangeDataBundle>; bootstraps: LocalStorage<string, BootstrapRequest>; outbox: LocalStorage<string, Uint8Array[]>; }>,
-        privateIdentityKey?: PrivateIdentityKey
-    ) {
-        super(storage, privateIdentityKey);
+    public constructor(opts?: Partial<FreeSignalSocketioState>) {
+        super(opts);
         this.emitter.on('send', this.sendHandler);
         this.emitter.on('bootstrap', ({ request }) => request?.accept());
     }

@@ -1,20 +1,16 @@
-import { Database, LocalStorage, Crypto, KeyExchangeDataBundle } from "@freesignal/interfaces";
-import { Datagram, PrivateIdentityKey, UserId } from "@freesignal/protocol";
-import { ExportedKeySession, KeySession } from "@freesignal/protocol/double-ratchet";
+import { Datagram, UserId } from "@freesignal/protocol";
+import { KeySession } from "@freesignal/protocol/double-ratchet";
 import { BootstrapRequest } from "@freesignal/protocol/node";
 import { io, Socket } from "socket.io-client";
 import { EventCallback } from "easyemitter.ts";
-import { FreeSignalSocketio, TransportEvent } from "./base.js"
+import { FreeSignalSocketio, FreeSignalSocketioState, TransportEvent } from "./base.js"
 
 export class FreeSignalClient extends FreeSignalSocketio {
     private _serverId?: string;
     private socket?: Socket;
 
-    public constructor(
-        storage: Database<{ sessions: LocalStorage<string, ExportedKeySession>; keyExchange: LocalStorage<string, Crypto.KeyPair>; users: LocalStorage<string, string>; bundles: LocalStorage<string, KeyExchangeDataBundle>; bootstraps: LocalStorage<string, BootstrapRequest>; outbox: LocalStorage<string, Uint8Array[]>; }>,
-        privateIdentityKey?: PrivateIdentityKey
-    ) {
-        super(storage, privateIdentityKey);
+    public constructor(opts?: Partial<FreeSignalSocketioState>) {
+        super(opts);
         this.emitter.on('send', this.sendHandler);
     }
 

@@ -1,7 +1,5 @@
-import { Database, LocalStorage, Crypto, KeyExchangeDataBundle } from "@freesignal/interfaces";
-import { Datagram, PrivateIdentityKey, UserId } from "@freesignal/protocol";
-import { ExportedKeySession } from "@freesignal/protocol/double-ratchet";
-import { BootstrapRequest, FreeSignalNode } from "@freesignal/protocol/node";
+import { Datagram, UserId } from "@freesignal/protocol";
+import { FreeSignalNode, FreeSignalNodeState } from "@freesignal/protocol/node";
 
 const TransportEventPrefix = "transport:";
 export enum TransportEvent {
@@ -9,15 +7,16 @@ export enum TransportEvent {
     HANDSHAKE = `${TransportEventPrefix}handshake`
 }
 
-export class FreeSignalSocketio extends FreeSignalNode {
-    protected readonly outbox: LocalStorage<string, Uint8Array[]>;
+export interface FreeSignalSocketioState extends FreeSignalNodeState {
+    outbox: Array<[string, Uint8Array[]]>
+}
 
-    public constructor(
-        storage: Database<{ sessions: LocalStorage<string, ExportedKeySession>; keyExchange: LocalStorage<string, Crypto.KeyPair>; users: LocalStorage<string, string>; bundles: LocalStorage<string, KeyExchangeDataBundle>; bootstraps: LocalStorage<string, BootstrapRequest>; outbox: LocalStorage<string, Uint8Array[]>; }>,
-        privateIdentityKey?: PrivateIdentityKey
-    ) {
-        super(storage, privateIdentityKey);
-        this.outbox = storage.outbox;
+export class FreeSignalSocketio extends FreeSignalNode {
+    protected readonly outbox: Map<string, Uint8Array[]>;
+
+    public constructor(opts?: Partial<FreeSignalSocketioState>) {
+        super(opts);
+        this.outbox = new Map(opts?.outbox);
     }
 
     protected async addToOutbox(userId: string | UserId, datagram: Datagram | Uint8Array) {
