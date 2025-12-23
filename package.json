@@ -1,6 +1,6 @@
 {
   "name": "@freesignal/socketio",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Socket.io trasnport package for FreeSignal protocol",
   "homepage": "https://github.com/christianbraghette/freesignal-socketio#readme",
   "bugs": {

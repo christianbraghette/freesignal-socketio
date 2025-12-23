@@ -47,6 +47,14 @@ export class FreeSignalClient extends FreeSignalSocketio {
                     }
                 });
 
+                const errorHandler = () => {
+                    this.socket?.close();
+                    this.socket = undefined;
+                    reject();
+                }
+
+                this.emitter.on('error', errorHandler);
+
                 this.socket.on(TransportEvent.MESSAGE, (data) => {
                     this.open(new Uint8Array(data));
                 });
@@ -58,12 +66,14 @@ export class FreeSignalClient extends FreeSignalSocketio {
                     resolve();
                 });
 
-                this.socket.on('error', (err) => this.onError(err));
+                this.socket.on('error', (err) => this.emitter.emit('error', err));
 
                 this.socket.on('disconnect', () => {
                     this.onClose();
                     this.socket = undefined;
                 });
+
+                this.emitter.off('error', errorHandler);
             } catch (error) {
                 reject(error);
             }

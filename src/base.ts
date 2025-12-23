@@ -20,19 +20,25 @@ export class FreeSignalSocketio extends FreeSignalNode {
     }
 
     protected async addToOutbox(userId: string | UserId, datagram: Datagram | Uint8Array) {
-        const array = await this.outbox.get(userId.toString());
+        const array = this.outbox.get(userId.toString());
         this.outbox.set(userId.toString(), [...(array ?? []), Datagram.from(datagram).toBytes()]);
     }
 
     protected async flushOutbox() {
-        for (const [userId, array] of Array.from(await this.outbox.entries() ?? [])) {
-            await this.outbox.delete(userId);
+        for (const [userId, array] of Array.from(this.outbox.entries() ?? [])) {
+            this.outbox.delete(userId);
             for (const data of array) {
                 this.emitter.emit('send', { userId: UserId.from(userId), datagram: Datagram.from(data) });
             }
         }
     }
 
+    public toJSON(): FreeSignalSocketioState {
+        return {
+            ...super.toJSON(),
+            outbox: Array.from(this.outbox.entries())
+        }
+    }
+
     public onClose: () => void = () => { };
-    public onError: (err: Event | Error) => void = () => { };
 }
