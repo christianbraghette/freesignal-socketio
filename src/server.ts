@@ -36,15 +36,13 @@ export class FreeSignalServer extends FreeSignalSocketio {
 
     protected sendHandler: EventCallback<{ session?: KeySession; datagram?: Datagram; userId?: UserId; }, typeof this.emitter> = (eventData) => {
         const { session, datagram, userId } = eventData;
+        if (!datagram)
+            throw new Error("Datagram missing");
         if (!userId && !session)
             throw new Error("UserId missing");
         const receiverId = userId?.toString() || session?.userId.toString()!;
         const socket = this.connections.get(receiverId);
-        if (!socket)
-            throw new Error("Socket not found for user: " + userId);
-        if (!datagram)
-            throw new Error("Datagram missing");
-        if (!socket.connected)
+        if (!socket?.connected)
             this.addToOutbox(receiverId, datagram);
         else
             socket.emit(TransportEvent.MESSAGE, datagram.toBytes());
