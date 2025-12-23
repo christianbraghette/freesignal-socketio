@@ -14,8 +14,6 @@ client2.onRequest = (request) => request.accept();
 setTimeout(() => client1.sendBootstrap(client2.userId), 500);
 setTimeout(() => {
     client1.sendData(client2.userId, "Hi Alice!");
-    client1.close();
-    client1.connect("ws://localhost:12437")
 }, 1000);
 setTimeout(() => client2.sendData(client1.userId, "Hi Bob!"), 1500);
 setTimeout(() => Promise.all(["How are you?", "How are this days?", "For me it's a good time"].map(msg => client1.sendData(client2.userId, msg))), 2000);
@@ -24,5 +22,13 @@ setTimeout(() => Promise.all(["I'm thinking...", "Is this secure?"].map(msg => c
 
 setTimeout(() => process.exit(), 3500);
 
-client1.connect("ws://localhost:12437").then(() => console.log("Connected"));
+client1.connect("ws://localhost:12437").then(async () => {
+    console.log("Connected");
+    client1.close();
+    const test = new FreeSignalClient(client1.toJSON());
+    //console.log(client1, test);
+    await test.connect("ws://localhost:12437");
+    test.close();
+    client1.connect("ws://localhost:12437").then(() => console.log("Connected"));
+});
 client2.connect("ws://localhost:12437").then(() => console.log("Connected"));

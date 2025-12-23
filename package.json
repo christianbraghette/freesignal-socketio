@@ -1,6 +1,6 @@
 {
   "name": "@freesignal/socketio",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Socket.io trasnport package for FreeSignal protocol",
   "homepage": "https://github.com/christianbraghette/freesignal-socketio#readme",
   "bugs": {
@@ -29,15 +29,14 @@
     "pretest": "tsc",
     "test": "node ./dist/test.js",
     "prepare": "tsc",
-    "prestart": "tsc",
-    "start": "node ./dist/run.js"
+    "prestart": "tsc"
   },
   "devDependencies": {
     "@types/node": "^22.15.21"
   },
   "dependencies": {
     "@freesignal/interfaces": "^0.3.1",
-    "@freesignal/protocol": "^0.9.0",
+    "@freesignal/protocol": "^0.9.3",
     "@freesignal/utils": "^1.5.1",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1"

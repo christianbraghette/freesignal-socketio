@@ -60,7 +60,7 @@ export class FreeSignalServer extends FreeSignalSocketio {
                 origin: (origin, callback) => callback(null, origin)
             }
         });
-        this.wss.on('connection', async (socket) => {
+        this.wss.on('connection', (socket) => {
             const userId: string = socket.handshake.auth.userId;
 
             if (!userId) {
@@ -75,10 +75,11 @@ export class FreeSignalServer extends FreeSignalSocketio {
             socket.on('disconnect', () => this.connections.delete(userId));
 
             socket.emit(TransportEvent.HANDSHAKE, this.userId.toString());
-            if (!(await this.sessions.has(userId))) {
-                this.sendBootstrap(userId);
-            } else {
+            const sessionTag = this.users.get(userId);
+            if (sessionTag && this.sessions.has(sessionTag)) {
                 this.sendHandshake(userId);
+            } else {
+                this.sendBootstrap(userId);
             }
         });
         return this;
